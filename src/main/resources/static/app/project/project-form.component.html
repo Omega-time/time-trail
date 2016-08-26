@@ -1,0 +1,4 @@
+<form #newProject="ngForm">
+    <input type="text" name="name" [(ngModel)]="projectToBeCreated.name" placeholder="Enter project name">
+    <input type="button" (click)="addProject()" value="Add project">
+</form>
