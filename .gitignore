@@ -1,3 +1,11 @@
+bin/
+.metadata/
+.recommenders/
+.checkstyle
+.classpath
+.project
+*.iml
+out/
 .idea/
-build/
-.gradle/
+target/
+.settings/
