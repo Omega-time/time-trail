@@ -1,6 +1,6 @@
 package paysafe.interns.models;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -16,6 +16,11 @@ public class Task extends BaseEntity {
 	private long duration;
 	/** Task comment (not required) */
 	private String comment;
+
+	/** The project to which the task belongs to. */
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "project_id", nullable = false, insertable = false, updatable = false)
+	private Project project;
 
 	public Task() {
 	}

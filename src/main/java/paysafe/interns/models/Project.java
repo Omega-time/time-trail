@@ -16,8 +16,8 @@ public class Project extends BaseEntity {
 	@NotNull
 	private String name;
 
-	/** List of tasks for the chosen project */
-	@OneToMany
+	/** List of tasks for the chosen project. */
+	@OneToMany(mappedBy = "project")
 	private List<Task> tasks;
 
 	public Project() {
