@@ -90,6 +90,18 @@ public class ProjectsRestController {
 		return response.toString();
 	}
 
+	/**
+	 * POST Serves the {@link TaskRepository#save(Task)} method. Saves a task in
+	 * the database related to the provided project id.
+	 * 
+	 * @param task
+	 *            the new Task which will be saved to the database.
+	 * @param projectId
+	 *            the project for which the new task is created.
+	 * @param bindingResult
+	 *            checks the entity validations
+	 * @return invalid data OR the Id of the newly created Task.
+	 */
 	@RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.POST)
 	public String addTask(@Valid @RequestBody Task task, @PathVariable Long projectId, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
