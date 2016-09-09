@@ -38,5 +38,10 @@ public class Project extends BaseEntity {
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
+	
+	@Override
+	public String toString() {
+		return "Project [name=" + name + ", tasks=" + tasks + "]";
+	}
 
 }

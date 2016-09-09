@@ -1,7 +1,9 @@
 package paysafe.interns.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Class representing a single Task in the database
@@ -10,10 +12,14 @@ import javax.validation.constraints.NotNull;
 public class Task extends BaseEntity {
 	/** Task name */
 	@NotNull
+	@Size(min=2,max=255)
 	private String name;
+	
 	/** Task duration */
 	@NotNull
+	@Min(0)
 	private long duration;
+	
 	/** Task comment (not required) */
 	private String comment;
 
@@ -49,4 +55,18 @@ public class Task extends BaseEntity {
 		this.comment = comment;
 	}
 
+	public Project getProject() {
+		return project;
+	}
+
+	public void setProject(Project project) {
+		this.project = project;
+	}
+
+	@Override
+	public String toString() {
+		return "Task [name=" + name + ", duration=" + duration + ", comment=" + comment + ", project=" + project + "]";
+	}
+
+	
 }
