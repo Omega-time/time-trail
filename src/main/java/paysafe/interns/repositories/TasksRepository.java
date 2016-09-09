@@ -1,6 +1,8 @@
 package paysafe.interns.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
 
 /**
@@ -9,4 +11,5 @@ import paysafe.interns.models.Task;
  * to the CRUD methods.
  */
 public interface TasksRepository extends JpaRepository<Task, Long> {
+	Iterable<Task> findAllByProjectId(Long projectId);
 }

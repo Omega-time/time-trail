@@ -18,14 +18,14 @@ public class Task extends BaseEntity {
 	
 	/** Task name */
 	@Size(min=2,max=255)
-	@NotNull
-	
+	@NotNull	
 	private String name;
+	
 	/** Task duration */
 	@Min(0)
-	@NotNull
-	
+	@NotNull	
 	private long duration;
+	
 	/** Task comment (not required) */
 	private String comment;
 	

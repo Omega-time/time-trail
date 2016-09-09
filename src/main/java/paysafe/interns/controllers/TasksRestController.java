@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,13 +27,13 @@ import paysafe.interns.repositories.TasksRepository;
  */
 @RestController
 public class TasksRestController {
-	
+
 	@Autowired
 	private ProjectsRepository projectsRepository;
-	
+
 	@Autowired
 	private TasksRepository tasksRepository;
-	
+
 	/**
 	 * POST Serves the {@link TaskRepository#save(Task)} method. Saves a task in
 	 * the database related to the provided project id.
@@ -47,11 +48,6 @@ public class TasksRestController {
 	 */
 	@RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.POST)
 	public String addTask(@Valid @RequestBody Task task, @PathVariable Long projectId, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			System.err.println("\nValidation data error - addTask!");
-			System.err.println("Task name: " + task.getName());
-			return "Invalid data!";
-		}
 		try {
 			Project project = projectsRepository.getOne(projectId);
 			task.setProject(project);
@@ -65,6 +61,26 @@ public class TasksRestController {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+
 		return response.toString();
+	}
+
+	@RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.GET)
+	public Iterable<Task> getAllTasksByProjectId(@PathVariable Long projectId) {
+
+		return tasksRepository.findAllByProjectId(projectId);
+	}
+
+	@RequestMapping(value = "/task/{taskId}", method = RequestMethod.DELETE)
+	public String deleteTaskByProjectId(@PathVariable Long taskId) {
+		try{
+		Task taskForDeleted = tasksRepository.getOne(taskId);
+		tasksRepository.delete(taskForDeleted);
+
+		return "Task " + taskId + " deleted.";
+		
+		} catch(JpaObjectRetrievalFailureException jorfe){
+			return "Unable to find task with id " + taskId;
+		}
 	}
 }
