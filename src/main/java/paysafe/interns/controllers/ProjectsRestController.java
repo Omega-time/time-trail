@@ -8,6 +8,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import paysafe.interns.exceptions.InvalidProjectException;
 import paysafe.interns.models.Project;
+import paysafe.interns.models.Task;
 import paysafe.interns.repositories.ProjectsRepository;
+import paysafe.interns.repositories.TasksRepository;
 
 /**
  * A RestController class where we define the endpoint URLs for the Project
@@ -26,6 +30,9 @@ import paysafe.interns.repositories.ProjectsRepository;
 public class ProjectsRestController {
 	@Autowired
 	private ProjectsRepository projectsRepository;
+
+	@Autowired
+	private TasksRepository tasksRepository;
 
 	/**
 	 * GET Serving {@link ProjectsRepository#findAll()} method
@@ -79,5 +86,33 @@ public class ProjectsRestController {
 			e.printStackTrace();
 		}
 		return response.toString();
+	}
+
+	/**
+	 * DELETE Serving {@link ProjectsRepository#delete(projectForDeleted)}
+	 * method. First get all tasks related to the provided project id and
+	 * deleted tasks.Then delete current project.
+	 * 
+	 * @param projectId
+	 *            a path parameter by which the method finds a specific progect
+	 * @return Project with current projectId deleted or Unable to find project
+	 *         with current projectId.
+	 */
+	@RequestMapping(value = "/project/{projectId}", method = RequestMethod.DELETE)
+	public String deleteProjectByProjectId(@PathVariable Long projectId) {
+		try {
+			Project projectForDeleted = projectsRepository.getOne(projectId);
+			Iterable<Task> tasksByCurrentProject = tasksRepository.findAllByProjectId(projectId);
+			for (Task task : tasksByCurrentProject) {
+				tasksRepository.delete(task);
+			}
+
+			projectsRepository.delete(projectForDeleted);
+
+			return "Project " + projectId + " deleted.";
+
+		} catch (JpaObjectRetrievalFailureException jorfe) {
+			return "Unable to find project with id " + projectId;
+		}
 	}
 }
