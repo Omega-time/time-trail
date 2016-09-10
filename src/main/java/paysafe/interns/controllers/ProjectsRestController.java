@@ -53,7 +53,11 @@ public class ProjectsRestController {
 	 * @return a json representation of a project or empty string
 	 */
 	@RequestMapping("/project/{id}")
-	Project getProjectById(@Param("id") Long id) {
+	Project getProjectById(@PathVariable Long id) {
+		Project project = this.projectsRepository.findOne(id);
+		if (project == null) {
+			throw new InvalidProjectException(String.format("Unable to find task with id %d", id));
+		}
 		return this.projectsRepository.findOne(id);
 	}
 
