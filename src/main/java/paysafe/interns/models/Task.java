@@ -70,5 +70,4 @@ public class Task extends BaseEntity {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-
 }

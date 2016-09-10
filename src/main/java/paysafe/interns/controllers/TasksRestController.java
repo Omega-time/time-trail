@@ -44,7 +44,8 @@ public class TasksRestController {
 	 *            the project for which the new task is created.
 	 * @param bindingResult
 	 *            checks the entity validations
-	 * @return invalid data OR the Id of the newly created Task.
+	 * @return Id of the newly created Task or Bad Request with error data
+	 *         object
 	 */
 	@RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.POST)
 	public String addTask(@Valid @RequestBody Task task, @PathVariable Long projectId, BindingResult bindingResult) {
@@ -65,21 +66,37 @@ public class TasksRestController {
 		return response.toString();
 	}
 
+	/**
+	 * GET Serving {@link TasksRepository#findAllByProjectId(projectId)} method
+	 * 
+	 * @param projectId
+	 *            a path parameter by which the method finds a specific tasks
+	 * @return a json string array of all tasks with current projectId or empty
+	 *         array
+	 */
 	@RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.GET)
 	public Iterable<Task> getAllTasksByProjectId(@PathVariable Long projectId) {
 
 		return tasksRepository.findAllByProjectId(projectId);
 	}
 
+	/**
+	 * DELETE Serving {@link TasksRepository#delete(taskForDeleted)} method
+	 * 
+	 * @param taskId
+	 *            a path parameter by which the method finds a specific task
+	 * @return Task with current taskId deleted or Unable to find task with
+	 *         current taskId.
+	 */
 	@RequestMapping(value = "/task/{taskId}", method = RequestMethod.DELETE)
 	public String deleteTaskByProjectId(@PathVariable Long taskId) {
-		try{
-		Task taskForDeleted = tasksRepository.getOne(taskId);
-		tasksRepository.delete(taskForDeleted);
+		try {
+			Task taskForDeleted = tasksRepository.getOne(taskId);
+			tasksRepository.delete(taskForDeleted);
 
-		return "Task " + taskId + " deleted.";
-		
-		} catch(JpaObjectRetrievalFailureException jorfe){
+			return "Task " + taskId + " deleted.";
+
+		} catch (JpaObjectRetrievalFailureException jorfe) {
 			return "Unable to find task with id " + taskId;
 		}
 	}
