@@ -1,5 +1,6 @@
 package paysafe.interns.controllers;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
@@ -78,6 +79,40 @@ public class TasksRestController {
 	public Iterable<Task> getAllTasksByProjectId(@PathVariable Long projectId) {
 
 		return tasksRepository.findAllByProjectId(projectId);
+	}
+
+	/**
+	 * GET Serving {@link TasksRepository#getOne(taskId)} method
+	 * 
+	 * @param taskId
+	 *            a path parameter by which the method finds a specific task
+	 * @return task with current taskId or Unable to find task with id current
+	 *         taskId
+	 */
+	@RequestMapping(value = "/task/{taskId}", method = RequestMethod.GET)
+	public String getTaskByTaskId(@PathVariable Long taskId) {
+		try {
+			Task task = null;
+			try {
+				task = tasksRepository.getOne(taskId);
+			} catch (ConstraintViolationException cve) {
+				throw new InvalidTaskException(cve);
+			}
+			JSONObject response = new JSONObject();
+			try {
+				response.put("id", task.getId());
+				response.put("name", task.getName());
+				response.put("duration", task.getDuration());
+				response.put("comment", task.getComment());
+				response.put("projectId", task.getProject().getId());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			return response.toString();
+		} catch (EntityNotFoundException enfe) {
+			return "Unable to find task with id " + taskId;
+		}
 	}
 
 	/**
