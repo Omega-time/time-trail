@@ -3,8 +3,10 @@ package paysafe.interns.models;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Class representing a single Project in the database and its connection to the
@@ -14,10 +16,11 @@ import javax.validation.constraints.NotNull;
 public class Project extends BaseEntity {
 	/** Project name */
 	@NotNull
+	@Size(min=2, max=255)
 	private String name;
 
-	/** List of tasks for the chosen project. */
-	@OneToMany(mappedBy = "project")
+	/** List of tasks for the chosen project */
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
 	private List<Task> tasks;
 
 	public Project() {
@@ -38,5 +41,4 @@ public class Project extends BaseEntity {
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
-
 }
