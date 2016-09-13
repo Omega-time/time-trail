@@ -21,7 +21,10 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A RestController class where we define the endpoint URLs for the Project
@@ -137,6 +140,12 @@ public class ProjectsRestController {
                                         MultipartFile multipartFile){
 		if (this.fileContentTypeIsAllowed(multipartFile.getContentType())){
 			Project project = projectsRepository.findOne(projectId);
+			//TODO: refactor checking the filename for uniqueness
+			for(Doc file : project.getFiles()){
+				if (file.getName().equals(multipartFile.getOriginalFilename())){
+					throw new InvalidDocException("There is already a file with the same name!");
+				}
+			}
 			try{
 				Doc file = new Doc();
 				file.setName(multipartFile.getOriginalFilename());
@@ -153,6 +162,14 @@ public class ProjectsRestController {
 					String.format("File with type %s not supported", multipartFile.getContentType()));
 		}
     }
+
+	@RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.GET)
+	public List<String> getAllFileNamesByProjectId(@Valid @PathVariable Long projectId){
+		List<String> fileNames = new LinkedList<>();
+		Project project = projectsRepository.findOne(projectId);
+		fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
+		return fileNames;
+	}
 
 	/**
 	 * Temporary method to be used while testing Doc Upload and for reference when
