@@ -3,10 +3,18 @@ package paysafe.interns.models;
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 
+/**
+ * Class representing an uploaded file (Doc) to the database. Not to be
+ * used on its own, currently implemented exclusively as a collection
+ * in {@link Project}
+ */
 @Embeddable
 public class Doc {
+    /** The name of the uploaded doc */
     private String name;
+    /** The content type of the uploaded doc */
     private String type;
+    /** The file itself as a binary array, stored in the database */
     @Lob
     private byte[] file;
 

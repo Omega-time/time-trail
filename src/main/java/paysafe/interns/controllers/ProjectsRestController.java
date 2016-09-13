@@ -179,7 +179,9 @@ public class ProjectsRestController {
 		//TODO: add all desirable MimeTypes
 		return contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_JPEG_VALUE)
 				|| contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_PNG_VALUE)
-				|| contentType.equalsIgnoreCase(MimeTypeUtils.TEXT_PLAIN_VALUE);
-
+				|| contentType.equalsIgnoreCase(MimeTypeUtils.TEXT_PLAIN_VALUE)
+				|| contentType.equalsIgnoreCase("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+				|| contentType.equalsIgnoreCase("application/msword")
+				|| contentType.equalsIgnoreCase("application/pdf");
 	}
 }

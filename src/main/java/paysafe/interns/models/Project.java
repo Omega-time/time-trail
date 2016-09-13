@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * Class representing a single Project in the database and its connection to the
- * tasks it should contain.
+ * tasks and docs it should contain.
  */
 @Entity
 public class Project extends BaseEntity {
@@ -27,6 +27,7 @@ public class Project extends BaseEntity {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
 	private List<Task> tasks;
 
+	/** Set of files(docs) for the chosen project */
 	@ElementCollection
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<Doc> files;
