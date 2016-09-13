@@ -5,8 +5,8 @@ import javax.persistence.Lob;
 
 @Embeddable
 public class Doc {
-    //TODO: Store the file extension
     private String name;
+    private String type;
     @Lob
     private byte[] file;
 
@@ -19,6 +19,14 @@ public class Doc {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public byte[] getFile() {

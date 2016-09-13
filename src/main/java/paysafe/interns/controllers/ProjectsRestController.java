@@ -5,8 +5,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import paysafe.interns.exceptions.InvalidDocException;
 import paysafe.interns.exceptions.InvalidProjectException;
 import paysafe.interns.models.Doc;
 import paysafe.interns.models.Project;
@@ -120,34 +122,64 @@ public class ProjectsRestController {
 		}
 	}
 
+	/**
+	 * PATCH Serving {@link ProjectsRepository} method.
+	 * Saves a given file in the project.
+	 * @param projectId
+	 * 				the project in which the file will be saved.
+	 * @param multipartFile
+	 * 				the file that will be saved in the project.
+	 * 				The file should have a valid content type {@link #fileContentTypeIsAllowed(String)}
+     * @return File saved! or File with type ___ not supported
+     */
     @RequestMapping(value = "/project/{projectId}", method = RequestMethod.PATCH)
     public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
                                         MultipartFile multipartFile){
-        Project project = projectsRepository.findOne(projectId);
-        try{
-            Doc file = new Doc();
-			file.setName("Test Doc One!");
-            file.setFile(multipartFile.getBytes());
-			project.getFiles().add(file);
-            projectsRepository.save(project);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "Doc saved!";
+		if (this.fileContentTypeIsAllowed(multipartFile.getContentType())){
+			Project project = projectsRepository.findOne(projectId);
+			try{
+				Doc file = new Doc();
+				file.setName(multipartFile.getOriginalFilename());
+				file.setFile(multipartFile.getBytes());
+				file.setType(multipartFile.getContentType());
+				project.getFiles().add(file);
+				projectsRepository.save(project);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return "File saved!";
+		} else{
+			throw new InvalidDocException(
+					String.format("File with type %s not supported", multipartFile.getContentType()));
+		}
     }
 
+	/**
+	 * Temporary method to be used while testing Doc Upload and for reference when
+	 * creating Download Doc.
+	 * @param projectId the id of a project with a saved file
+	 * @param response the first file saved in the project with projectId
+     */
 	@RequestMapping(value = "/download/{projectId}", method = RequestMethod.GET)
 	public void getFileFromProject(@PathVariable Long projectId, HttpServletResponse response){
 		Project project = projectsRepository.findOne(projectId);
 		try{
 			Set<Doc> files = project.getFiles();
-			//TODO: get a particular file instead of the first one
 			Doc file = files.iterator().next();
+			response.setHeader("Content-Disposition", "inline; filename=\""+ file.getName() +"\"");
+			response.setContentType(file.getType());
 			response.setContentLength(file.getFile().length);
-			//TODO: set ContentType
 			FileCopyUtils.copy(file.getFile(), response.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private boolean fileContentTypeIsAllowed(String contentType){
+		//TODO: add all desirable MimeTypes
+		return contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_JPEG_VALUE)
+				|| contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_PNG_VALUE)
+				|| contentType.equalsIgnoreCase(MimeTypeUtils.TEXT_PLAIN_VALUE);
+
 	}
 }
