@@ -1,12 +1,16 @@
 package paysafe.interns.models;
 
-import java.util.List;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Class representing a single Project in the database and its connection to the
@@ -22,6 +26,11 @@ public class Project extends BaseEntity {
 	/** List of tasks for the chosen project */
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
 	private List<Task> tasks;
+
+	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Set<Doc> files;
+
 
 	public Project() {
 	}
@@ -40,5 +49,13 @@ public class Project extends BaseEntity {
 
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
+	}
+
+	public Set<Doc> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Set<Doc> files) {
+		this.files = files;
 	}
 }

@@ -1,25 +1,25 @@
 package paysafe.interns.controllers;
 
-import java.io.Serializable;
-
-import javax.validation.ConstraintViolationException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import paysafe.interns.exceptions.InvalidProjectException;
+import paysafe.interns.models.Doc;
 import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
 import paysafe.interns.repositories.ProjectsRepository;
 import paysafe.interns.repositories.TasksRepository;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * A RestController class where we define the endpoint URLs for the Project
@@ -93,7 +93,7 @@ public class ProjectsRestController {
 	}
 
 	/**
-	 * DELETE Serving {@link ProjectsRepository#delete(projectForDeleted)}
+	 * DELETE Serving {@link ProjectsRepository}
 	 * method. First get all tasks related to the provided project id and
 	 * deleted tasks.Then delete current project.
 	 * 
@@ -117,6 +117,37 @@ public class ProjectsRestController {
 
 		} catch (JpaObjectRetrievalFailureException jorfe) {
 			return "Unable to find project with id " + projectId;
+		}
+	}
+
+    @RequestMapping(value = "/project/{projectId}", method = RequestMethod.PATCH)
+    public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
+                                        MultipartFile multipartFile){
+        Project project = projectsRepository.findOne(projectId);
+        try{
+            Doc file = new Doc();
+			file.setName("Test Doc One!");
+            file.setFile(multipartFile.getBytes());
+			project.getFiles().add(file);
+            projectsRepository.save(project);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Doc saved!";
+    }
+
+	@RequestMapping(value = "/download/{projectId}", method = RequestMethod.GET)
+	public void getFileFromProject(@PathVariable Long projectId, HttpServletResponse response){
+		Project project = projectsRepository.findOne(projectId);
+		try{
+			Set<Doc> files = project.getFiles();
+			//TODO: get a particular file instead of the first one
+			Doc file = files.iterator().next();
+			response.setContentLength(file.getFile().length);
+			//TODO: set ContentType
+			FileCopyUtils.copy(file.getFile(), response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
