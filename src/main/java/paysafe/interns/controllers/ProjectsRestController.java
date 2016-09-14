@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 @RestController
 public class ProjectsRestController {
+    private static final int MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB = 10240;
     @Autowired
     private ProjectsRepository projectsRepository;
 
@@ -138,8 +139,9 @@ public class ProjectsRestController {
     @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.POST)
     public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
             MultipartFile multipartFile) {
-        if (this.fileContentTypeIsAllowed(multipartFile.getContentType())) {
-            Project project = projectsRepository.findOne(projectId);
+        Project project = projectsRepository.findOne(projectId);
+        if (this.fileContentTypeIsAllowed(multipartFile.getContentType())
+                && (multipartFile.getSize()/1024)+this.totalSizeInKbOfFilesInProject(project) <= MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB) {
             //TODO: refactor checking the filename for uniqueness
             for (Doc file : project.getFiles()) {
                 if (file.getName().equals(multipartFile.getOriginalFilename())) {
@@ -179,6 +181,7 @@ public class ProjectsRestController {
         List<String> fileNames = new LinkedList<>();
         Project project = projectsRepository.findOne(projectId);
         fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
+        System.out.println("----------------------------"+this.totalSizeInKbOfFilesInProject(project) + "KB");
         return fileNames;
     }
 
@@ -269,5 +272,14 @@ public class ProjectsRestController {
                 .equalsIgnoreCase("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                 || contentType.equalsIgnoreCase("application/msword")
                 || contentType.equalsIgnoreCase("application/pdf");
+    }
+
+    private long totalSizeInKbOfFilesInProject(Project project){
+        Set<Doc> files = project.getFiles();
+        long size = 0;
+        for (Doc file : files){
+            size+=file.getFile().length;
+        }
+        return size/1024;
     }
 }
