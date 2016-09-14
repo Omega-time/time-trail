@@ -127,15 +127,13 @@ public class ProjectsRestController {
     }
 
     /**
-     * PATCH Serving {@link ProjectsRepository} method.
+     * POST for project files
      * Saves a given file in the project.
      *
      * @param projectId     the project in which the file will be saved.
      * @param multipartFile the file that will be saved in the project.
      *                      The file should have a valid content type {@link #fileContentTypeIsAllowed(String)}
-     * @return File saved! or throws exception
-     * File with type ___ not supported
-     * or There is already a file with the same name!
+     * @return The name of the uploaded file if uploaded successfully.
      */
     @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.POST)
     public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
@@ -170,7 +168,7 @@ public class ProjectsRestController {
     }
 
     /**
-     * GET Serving {@link ProjectsRepository} files method.
+     * GET for file names
      * Lists the names of all files currently associated with the project.
      *
      * @param projectId the id of the project
@@ -185,18 +183,19 @@ public class ProjectsRestController {
     }
 
     /**
-     * GET Serving {@link ProjectsRepository} files method.
-     *
-     * @param projectId
-     * @param fileName
-     * @param response
+     * GET for particular file
+     * Sends the file from the project with the desired fileName to the OutputStream
+     * to be downloaded/used.
+     * @param projectId the id of the project
+     * @param fileName the name of the desired file
+     * @param response used to set headers and access OutputStream
      */
     @RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.GET)
     public void getFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
             HttpServletResponse response) {
         try {
             Project project = projectsRepository.findOne(projectId);
-            Doc file = getFileByName(fileName, project);
+            Doc file = getFileFromProjectByName(fileName, project);
             if (this.fileExistsInProject(file, project)) {
                 response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
                 response.setContentType(file.getType());
@@ -210,10 +209,17 @@ public class ProjectsRestController {
         }
     }
 
+    /**
+     * DELETE a particular file
+     * First checks if a file with the given name exists, if it does, deletes it.
+     * @param projectId the id of the project containing the desired file
+     * @param fileName the name of the file to be deleted
+     * @return The name of the deleted file if successful
+     */
     @RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.DELETE)
     public String deleteFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName) {
         Project project = projectsRepository.findOne(projectId);
-        Doc file = getFileByName(fileName, project);
+        Doc file = getFileFromProjectByName(fileName, project);
         JSONObject response = new JSONObject();
         if (this.fileExistsInProject(file, project)) {
             project.getFiles().remove(file);
@@ -223,13 +229,13 @@ public class ProjectsRestController {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return "File " + fileName + " successfully deleted!";
+            return response.toString();
         } else {
             throw new DocNotFoundException("No file found with name: " + fileName);
         }
     }
 
-    private Doc getFileByName(String fileName, Project project) {
+    private Doc getFileFromProjectByName(String fileName, Project project) {
         Doc tempFile;
         Doc file = null;
         Set<Doc> files = project.getFiles();
@@ -248,6 +254,12 @@ public class ProjectsRestController {
         return file != null && project.getFiles().contains(file);
     }
 
+    /**
+     * Checks if the given input type is supported, currently:
+     * jpeg, png, txt, docx, doc, pdf
+     * @param contentType the content type to be checked
+     * @return true if the content type is supported, false otherwise
+     */
     private boolean fileContentTypeIsAllowed(String contentType) {
         //TODO: add all desirable MimeTypes
         return contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_JPEG_VALUE)
