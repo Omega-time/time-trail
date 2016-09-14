@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
  * service. It uses Autowired annotation in order to use component scan for our
  * {@link ProjectsRepository}
  */
+@RequestMapping("/api")
 @RestController
 public class ProjectsRestController {
     @Autowired
