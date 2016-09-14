@@ -21,6 +21,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -133,7 +134,9 @@ public class ProjectsRestController {
 	 * @param multipartFile
 	 * 				the file that will be saved in the project.
 	 * 				The file should have a valid content type {@link #fileContentTypeIsAllowed(String)}
-     * @return File saved! or File with type ___ not supported
+     * @return File saved! or throws exception
+	 * 		File with type ___ not supported
+	 * 		or There is already a file with the same name!
      */
     @RequestMapping(value = "/project/{projectId}", method = RequestMethod.PATCH)
     public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
@@ -163,12 +166,47 @@ public class ProjectsRestController {
 		}
     }
 
+	/**
+	 * GET Serving {@link ProjectsRepository} files method.
+	 * Lists the names of all files currently associated with the project.
+	 * @param projectId the id of the project
+	 * @return a List of all the names of the files currently saved in the project.
+     */
 	@RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.GET)
 	public List<String> getAllFileNamesByProjectId(@Valid @PathVariable Long projectId){
 		List<String> fileNames = new LinkedList<>();
 		Project project = projectsRepository.findOne(projectId);
 		fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
 		return fileNames;
+	}
+
+	@RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.GET)
+	public void getFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName, HttpServletResponse response){
+		Doc tempFile;
+		Doc file = null;
+		try{
+			Project project = projectsRepository.findOne(projectId);
+			Set<Doc> files = project.getFiles();
+			Iterator<Doc> it = files.iterator();
+			while (it.hasNext()){
+				tempFile = it.next();
+				if (fileName.equals(tempFile.getName())){
+					file = tempFile;
+					break;
+				}
+
+			}
+			if (file == null){
+				throw new InvalidDocException("No file found with name: " + fileName);
+			} else{
+				response.setHeader("Content-Disposition", "inline; filename=\""+ file.getName() +"\"");
+				response.setContentType(file.getType());
+				response.setContentLength(file.getFile().length);
+				FileCopyUtils.copy(file.getFile(), response.getOutputStream());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
