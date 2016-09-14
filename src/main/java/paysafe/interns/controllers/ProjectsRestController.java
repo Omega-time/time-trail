@@ -8,6 +8,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import paysafe.interns.exceptions.DocNotFoundException;
 import paysafe.interns.exceptions.InvalidDocException;
 import paysafe.interns.exceptions.InvalidProjectException;
 import paysafe.interns.models.Doc;
@@ -138,7 +139,7 @@ public class ProjectsRestController {
 	 * 		File with type ___ not supported
 	 * 		or There is already a file with the same name!
      */
-    @RequestMapping(value = "/project/{projectId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.POST)
     public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
                                         MultipartFile multipartFile){
 		if (this.fileContentTypeIsAllowed(multipartFile.getContentType())){
@@ -182,22 +183,11 @@ public class ProjectsRestController {
 
 	@RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.GET)
 	public void getFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName, HttpServletResponse response){
-		Doc tempFile;
-		Doc file = null;
 		try{
 			Project project = projectsRepository.findOne(projectId);
-			Set<Doc> files = project.getFiles();
-			Iterator<Doc> it = files.iterator();
-			while (it.hasNext()){
-				tempFile = it.next();
-				if (fileName.equals(tempFile.getName())){
-					file = tempFile;
-					break;
-				}
-
-			}
+			Doc file = getFileByName(fileName, project);
 			if (file == null){
-				throw new InvalidDocException("No file found with name: " + fileName);
+				throw new DocNotFoundException("No file found with name: " + fileName);
 			} else{
 				response.setHeader("Content-Disposition", "inline; filename=\""+ file.getName() +"\"");
 				response.setContentType(file.getType());
@@ -209,25 +199,32 @@ public class ProjectsRestController {
 		}
 	}
 
-	/**
-	 * Temporary method to be used while testing Doc Upload and for reference when
-	 * creating Download Doc.
-	 * @param projectId the id of a project with a saved file
-	 * @param response the first file saved in the project with projectId
-     */
-	@RequestMapping(value = "/download/{projectId}", method = RequestMethod.GET)
-	public void getFileFromProject(@PathVariable Long projectId, HttpServletResponse response){
+	@RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.DELETE)
+	public String deleteFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName){
 		Project project = projectsRepository.findOne(projectId);
-		try{
-			Set<Doc> files = project.getFiles();
-			Doc file = files.iterator().next();
-			response.setHeader("Content-Disposition", "inline; filename=\""+ file.getName() +"\"");
-			response.setContentType(file.getType());
-			response.setContentLength(file.getFile().length);
-			FileCopyUtils.copy(file.getFile(), response.getOutputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
+		Doc file = getFileByName(fileName, project);
+		if (file == null || !project.getFiles().contains(file)){
+			throw new DocNotFoundException("No file found with name: " + fileName);
+		} else{
+			project.getFiles().remove(file);
+			projectsRepository.save(project);
+			return "File "+fileName+" successfully deleted!";
 		}
+	}
+
+	private Doc getFileByName(String fileName, Project project){
+		Doc tempFile;
+		Doc file = null;
+		Set<Doc> files = project.getFiles();
+		Iterator<Doc> it = files.iterator();
+		while (it.hasNext()){
+			tempFile = it.next();
+			if (fileName.equals(tempFile.getName())){
+				file = tempFile;
+				break;
+			}
+		}
+		return file;
 	}
 
 	private boolean fileContentTypeIsAllowed(String contentType){
