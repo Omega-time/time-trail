@@ -162,16 +162,14 @@ public class ProjectsRestController {
     @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.GET)
     public String getAllDocNamesByProjectId(@Valid @PathVariable Long projectId) {
         JSONArray jsonArray = new JSONArray();
-        //List<String> files = new LinkedList<>();
         Project project = projectsRepository.findOne(projectId);
-        //fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
-        JSONObject response = new JSONObject();
         for (Doc doc : project.getFiles()){
             try {
-                response.put("name", doc.getName());
-                response.put("size", doc.getFileSizeKb());
-                response.put("type", doc.getType());
-                jsonArray.put(response);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", doc.getName());
+                jsonObject.put("size", doc.getFileSizeKb());
+                jsonObject.put("type", doc.getType());
+                jsonArray.put(jsonObject);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
