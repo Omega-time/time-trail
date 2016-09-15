@@ -55,10 +55,10 @@ public final class DocUtilities {
     public static long totalSizeInKbOfDocsInProject(Project project){
         Set<Doc> files = project.getFiles();
         long size = 0;
-        for (Doc file : files){
-            size+=file.getFile().length;
+        for (Doc doc : files){
+            size+=doc.getFileSizeKb();
         }
-        return size/1024;
+        return size;
     }
 
     public static boolean multipartFileIsEligibleForUpload(MultipartFile multipartFile, Project project){
@@ -81,6 +81,7 @@ public final class DocUtilities {
         doc.setType(multipartFile.getContentType());
         try {
             doc.setFile(multipartFile.getBytes());
+            doc.setFileSizeKb(multipartFile.getSize()/1024);
         } catch (IOException e) {
             e.printStackTrace();
         }

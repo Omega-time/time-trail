@@ -1,5 +1,6 @@
 package paysafe.interns.controllers;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A RestController class where we define the endpoint URLs for the Project
@@ -162,11 +160,23 @@ public class ProjectsRestController {
      * @return a List of all the names of the files currently saved in the project.
      */
     @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.GET)
-    public List<String> getAllDocNamesByProjectId(@Valid @PathVariable Long projectId) {
-        List<String> fileNames = new LinkedList<>();
+    public String getAllDocNamesByProjectId(@Valid @PathVariable Long projectId) {
+        JSONArray jsonArray = new JSONArray();
+        //List<String> files = new LinkedList<>();
         Project project = projectsRepository.findOne(projectId);
-        fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
-        return fileNames;
+        //fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
+        JSONObject response = new JSONObject();
+        for (Doc doc : project.getFiles()){
+            try {
+                response.put("name", doc.getName());
+                response.put("size", doc.getFileSizeKb());
+                response.put("type", doc.getType());
+                jsonArray.put(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonArray.toString();
     }
 
     /**

@@ -18,6 +18,9 @@ public class Doc {
     @Lob
     private byte[] file;
 
+    private long fileSizeKb;
+
+
     public Doc() {
     }
 
@@ -43,6 +46,15 @@ public class Doc {
 
     public void setFile(byte[] file) {
         this.file = file;
+    }
+
+
+    public long getFileSizeKb() {
+        return fileSizeKb;
+    }
+
+    public void setFileSizeKb(long fileSizeKb) {
+        this.fileSizeKb = fileSizeKb;
     }
 
     @Override public String toString() {
