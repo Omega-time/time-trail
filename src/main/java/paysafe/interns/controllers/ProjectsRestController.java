@@ -165,13 +165,9 @@ public class ProjectsRestController {
         Project project = projectsRepository.findOne(projectId);
         for (Doc doc : project.getFiles()){
             try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", doc.getName());
-                jsonObject.put("size", doc.getFileSizeKb());
-                jsonObject.put("type", doc.getType());
-                jsonArray.put(jsonObject);
+                jsonArray.put(DocUtilities.createJsonObjectFromDoc(doc));
             } catch (JSONException e) {
-                e.printStackTrace();
+                System.err.println("Something went wrong when parsing Doc to JSONObject");
             }
         }
         return jsonArray.toString();
