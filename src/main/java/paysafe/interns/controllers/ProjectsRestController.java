@@ -4,12 +4,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import paysafe.interns.exceptions.DocNotFoundException;
 import paysafe.interns.exceptions.InvalidDocException;
 import paysafe.interns.exceptions.InvalidProjectException;
+import paysafe.interns.helpers.DocUtilities;
 import paysafe.interns.models.Doc;
 import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
@@ -21,10 +21,8 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -133,39 +131,26 @@ public class ProjectsRestController {
      *
      * @param projectId     the project in which the file will be saved.
      * @param multipartFile the file that will be saved in the project.
-     *                      The file should have a valid content type {@link #fileContentTypeIsAllowed(String)}
+     *                      The file should have a valid content type {@link DocUtilities#docContentTypeIsAllowed(String)}
      * @return The name of the uploaded file if uploaded successfully.
      */
     @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.POST)
-    public String uploadFileToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
+    public String uploadDocToProject(@Valid @PathVariable Long projectId, @RequestParam("file")
             MultipartFile multipartFile) {
         Project project = projectsRepository.findOne(projectId);
-        if (this.fileContentTypeIsAllowed(multipartFile.getContentType())
-                && (multipartFile.getSize()/1024)+this.totalSizeInKbOfFilesInProject(project) <= MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB) {
-            //TODO: refactor checking the filename for uniqueness
-            for (Doc file : project.getFiles()) {
-                if (file.getName().equals(multipartFile.getOriginalFilename())) {
-                    throw new InvalidDocException("There is already a file with the same name!");
-                }
-            }
+        if (DocUtilities.multipartFileIsEligibleForUpload(multipartFile, project)){
             JSONObject response = new JSONObject();
             try {
-                Doc file = new Doc();
-                file.setName(multipartFile.getOriginalFilename());
-                file.setFile(multipartFile.getBytes());
-                file.setType(multipartFile.getContentType());
+                Doc file = DocUtilities.createDocFromMultipartFile(multipartFile);
                 project.getFiles().add(file);
                 projectsRepository.save(project);
                 response.put("name", file.getName());
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             return response.toString();
         } else {
-            throw new InvalidDocException(
-                    String.format("File with type %s not supported", multipartFile.getContentType()));
+            throw new InvalidDocException("File cannot be uploaded!");
         }
     }
 
@@ -177,11 +162,10 @@ public class ProjectsRestController {
      * @return a List of all the names of the files currently saved in the project.
      */
     @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.GET)
-    public List<String> getAllFileNamesByProjectId(@Valid @PathVariable Long projectId) {
+    public List<String> getAllDocNamesByProjectId(@Valid @PathVariable Long projectId) {
         List<String> fileNames = new LinkedList<>();
         Project project = projectsRepository.findOne(projectId);
         fileNames.addAll(project.getFiles().stream().map(Doc::getName).collect(Collectors.toList()));
-        System.out.println("----------------------------"+this.totalSizeInKbOfFilesInProject(project) + "KB");
         return fileNames;
     }
 
@@ -194,12 +178,12 @@ public class ProjectsRestController {
      * @param response used to set headers and access OutputStream
      */
     @RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.GET)
-    public void getFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
+    public void getDocFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
             HttpServletResponse response) {
         try {
             Project project = projectsRepository.findOne(projectId);
-            Doc file = getFileFromProjectByName(fileName, project);
-            if (this.fileExistsInProject(file, project)) {
+            Doc file = DocUtilities.getDocFromProjectByName(fileName, project);
+            if (DocUtilities.docExistsInProject(file, project)) {
                 response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
                 response.setContentType(file.getType());
                 response.setContentLength(file.getFile().length);
@@ -220,11 +204,11 @@ public class ProjectsRestController {
      * @return The name of the deleted file if successful
      */
     @RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.DELETE)
-    public String deleteFileFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName) {
+    public String deleteDocFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName) {
         Project project = projectsRepository.findOne(projectId);
-        Doc file = getFileFromProjectByName(fileName, project);
+        Doc file = DocUtilities.getDocFromProjectByName(fileName, project);
         JSONObject response = new JSONObject();
-        if (this.fileExistsInProject(file, project)) {
+        if (DocUtilities.docExistsInProject(file, project)) {
             project.getFiles().remove(file);
             projectsRepository.save(project);
             try {
@@ -236,50 +220,5 @@ public class ProjectsRestController {
         } else {
             throw new DocNotFoundException("No file found with name: " + fileName);
         }
-    }
-
-    private Doc getFileFromProjectByName(String fileName, Project project) {
-        Doc tempFile;
-        Doc file = null;
-        Set<Doc> files = project.getFiles();
-        Iterator<Doc> it = files.iterator();
-        while (it.hasNext()) {
-            tempFile = it.next();
-            if (fileName.equals(tempFile.getName())) {
-                file = tempFile;
-                break;
-            }
-        }
-        return file;
-    }
-
-    private boolean fileExistsInProject(Doc file, Project project) {
-        return file != null && project.getFiles().contains(file);
-    }
-
-    /**
-     * Checks if the given input type is supported, currently:
-     * jpeg, png, txt, docx, doc, pdf
-     * @param contentType the content type to be checked
-     * @return true if the content type is supported, false otherwise
-     */
-    private boolean fileContentTypeIsAllowed(String contentType) {
-        //TODO: add all desirable MimeTypes
-        return contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_JPEG_VALUE)
-                || contentType.equalsIgnoreCase(MimeTypeUtils.IMAGE_PNG_VALUE)
-                || contentType.equalsIgnoreCase(MimeTypeUtils.TEXT_PLAIN_VALUE)
-                || contentType
-                .equalsIgnoreCase("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-                || contentType.equalsIgnoreCase("application/msword")
-                || contentType.equalsIgnoreCase("application/pdf");
-    }
-
-    private long totalSizeInKbOfFilesInProject(Project project){
-        Set<Doc> files = project.getFiles();
-        long size = 0;
-        for (Doc file : files){
-            size+=file.getFile().length;
-        }
-        return size/1024;
     }
 }
