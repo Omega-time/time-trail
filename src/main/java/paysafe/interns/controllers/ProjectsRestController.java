@@ -9,11 +9,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import paysafe.interns.exceptions.InvalidProjectException;
 import paysafe.interns.models.Project;
@@ -27,7 +23,7 @@ import paysafe.interns.repositories.TasksRepository;
  * {@link ProjectsRepository}
  */
 @RestController
-public class ProjectsRestController {
+public class ProjectsRestController extends BaseRestController {
 	@Autowired
 	private ProjectsRepository projectsRepository;
 
@@ -41,6 +37,7 @@ public class ProjectsRestController {
 	 */
 	// TODO: Should return all projects created by a user
 	@RequestMapping("/projects")
+	@CrossOrigin
 	Iterable<Project> getAllProjects() {
 		return this.projectsRepository.findAll();
 	}

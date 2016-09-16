@@ -9,11 +9,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import paysafe.interns.exceptions.InvalidTaskException;
 import paysafe.interns.models.Project;
@@ -27,7 +23,7 @@ import paysafe.interns.repositories.TasksRepository;
  * {@link TasksRepository}
  */
 @RestController
-public class TasksRestController {
+public class TasksRestController extends BaseRestController {
 
 	@Autowired
 	private ProjectsRepository projectsRepository;

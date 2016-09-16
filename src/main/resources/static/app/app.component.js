@@ -11,13 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var project_list_component_1 = require("./project/project-list.component");
 var router_1 = require("@angular/router");
+var auth_service_1 = require('./auth/auth.service');
 /**
  * Represents the main class from where the Angular App starts.
  * @class
  */
 var AppComponent = (function () {
-    function AppComponent() {
-        this.title = 'app works!';
+    function AppComponent(authService) {
+        this.authService = authService;
     }
     AppComponent = __decorate([
         core_1.Component({
@@ -25,9 +26,10 @@ var AppComponent = (function () {
             selector: 'app-root',
             templateUrl: 'app.component.html',
             styleUrls: ['app.component.css'],
-            directives: [project_list_component_1.ProjectListComponent, router_1.ROUTER_DIRECTIVES]
+            directives: [project_list_component_1.ProjectListComponent, router_1.ROUTER_DIRECTIVES],
+            providers: [auth_service_1.AuthService]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [auth_service_1.AuthService])
     ], AppComponent);
     return AppComponent;
 }());

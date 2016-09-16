@@ -6,9 +6,21 @@
  * User Configuration.
  **********************************************************************************************/
 /** Map relative paths to URLs. */
-var map = {};
+var map = {
+    'angular2-oauth2': 'vendor/angular2-oauth2',
+    "base64-js": "vendor/angular2-oauth2/node_modules/base64-js/lib/b64.js",
+    "buffer": "vendor/angular2-oauth2/node_modules/buffer/index.js",
+    "convert-hex": "vendor/angular2-oauth2/node_modules/sha256/node_modules/convert-hex/convert-hex.js",
+    "convert-string": "vendor/angular2-oauth2/node_modules/sha256/node_modules/convert-string/convert-string.js",
+    "ieee754": "vendor/angular2-oauth2/node_modules/buffer/node_modules/ieee754/index.js",
+    "isarray": "vendor/angular2-oauth2/node_modules/buffer/node_modules/isarray/index.js",
+    "js-base64": "vendor/angular2-oauth2/node_modules/js-base64/base64.js",
+    "sha256": "vendor/angular2-oauth2/node_modules/sha256/lib/sha256.js",
+};
 /** User packages configuration. */
-var packages = {};
+var packages = {
+    'angular2-oauth2': { defaultExtension: 'js' }
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /***********************************************************************************************
  * Everything underneath this line is managed by the CLI.
