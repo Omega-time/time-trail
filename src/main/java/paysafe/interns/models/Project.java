@@ -7,6 +7,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -22,6 +23,11 @@ public class Project extends BaseEntity {
 	@NotNull
 	@Size(min=2, max=255)
 	private String name;
+
+	@ManyToOne
+	@JoinColumn(name = "project_owner")
+	private UserInfo user;
+
 
 	/** List of tasks for the chosen project */
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
@@ -58,5 +64,13 @@ public class Project extends BaseEntity {
 
 	public void setFiles(Set<Doc> files) {
 		this.files = files;
+	}
+
+	public UserInfo getUser() {
+		return user;
+	}
+
+	public void setUser(UserInfo user) {
+		this.user = user;
 	}
 }

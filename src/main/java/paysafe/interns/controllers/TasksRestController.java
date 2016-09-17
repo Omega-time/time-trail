@@ -24,7 +24,7 @@ import java.io.Serializable;
  */
 @RequestMapping("/api")
 @RestController
-public class TasksRestController {
+public class TasksRestController extends BaseRestController {
 
     @Autowired
     private ProjectsRepository projectsRepository;

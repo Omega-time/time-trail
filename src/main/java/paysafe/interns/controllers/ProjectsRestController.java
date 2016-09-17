@@ -1,12 +1,25 @@
 package paysafe.interns.controllers;
 
+import java.io.IOException;
+import java.io.Serializable;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import paysafe.interns.exceptions.DocNotFoundException;
 import paysafe.interns.exceptions.InvalidDocException;
 import paysafe.interns.exceptions.InvalidProjectException;
@@ -16,12 +29,6 @@ import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
 import paysafe.interns.repositories.ProjectsRepository;
 import paysafe.interns.repositories.TasksRepository;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.io.Serializable;
 
 /**
  * A RestController class where we define the endpoint URLs for the Project
@@ -63,6 +70,7 @@ public class ProjectsRestController {
         }
         return this.projectsRepository.findOne(id);
     }
+
 
     /**
      * POST Serves the {@link ProjectsRepository#save(Object)} method. Saves a
