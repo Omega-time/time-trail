@@ -22,7 +22,6 @@ import java.io.Serializable;
  * service. It uses Autowired annotation in order to use component scan for our
  * {@link TasksRepository}
  */
-@RequestMapping("/api")
 @RestController
 public class TasksRestController extends BaseRestController {
 

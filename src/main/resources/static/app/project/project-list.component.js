@@ -29,7 +29,9 @@ var ProjectListComponent = (function () {
         var _this = this;
         this.projectService.getAllProjects()
             .then(function (projects) { return _this.projects = projects; })
-            .catch(function (err) { return console.error(err); });
+            .catch(function (err) {
+            console.error(err);
+        });
     };
     ProjectListComponent = __decorate([
         core_1.Component({

@@ -1,0 +1,45 @@
+{
+  "name": "angular2-oauth2",
+  "version": "1.3.10",
+  "description": "Support for OAuth 2 and OpenId Connect (OIDC) for Angular 2.",
+  "main": "oauth-service.js",
+  "author": {
+    "name": "Manfred Steyer",
+    "url": "http://www.softwarearchitekt.at"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "base64-js": "^0",
+    "buffer": "^3",
+    "js-base64": "^2.1.9",
+    "sha256": "^0.2.0"
+  },
+  "gitHead": "0bce14f4be2d41c248cbd6ad5b6ea5986bf2a121",
+  "_id": "angular2-oauth2@1.3.10",
+  "scripts": {},
+  "_shasum": "ce7a8516725333c6682654ab6b0a3f4a27bfae7a",
+  "_from": "angular2-oauth2@>=1.3.8 <2.0.0",
+  "_npmVersion": "3.8.9",
+  "_nodeVersion": "6.2.0",
+  "_npmUser": {
+    "name": "manfred.steyer",
+    "email": "manfred.steyer@softwarearchitekt.at"
+  },
+  "dist": {
+    "shasum": "ce7a8516725333c6682654ab6b0a3f4a27bfae7a",
+    "tarball": "https://registry.npmjs.org/angular2-oauth2/-/angular2-oauth2-1.3.10.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "manfred.steyer",
+      "email": "manfred.steyer@softwarearchitekt.at"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/angular2-oauth2-1.3.10.tgz_1464977741529_0.7071748981252313"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/angular2-oauth2/-/angular2-oauth2-1.3.10.tgz",
+  "readme": "ERROR: No README data found!"
+}
