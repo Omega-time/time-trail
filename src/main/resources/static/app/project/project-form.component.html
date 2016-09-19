@@ -1,4 +1,26 @@
-<form #newProject="ngForm">
-    <input type="text" name="name" [(ngModel)]="projectToBeCreated.name" placeholder="Enter project name">
-    <input type="button" (click)="addProject()" value="Add project">
-</form>
+<div id="projectForm" class="well">
+    <form *ngIf="active" #newProject=ngForm class="form-horizontal">
+        <fieldset>
+            <div class="form-group">
+                <div class="col-lg-10">
+                    <textarea type="text" name="name" [(ngModel)]="projectToBeCreated.name" placeholder="Enter project name" class="form-control"
+                        minlength="2" maxlength="90" required cols=15 rows=2 #name="ngModel"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-10">
+                    <div [hidden]="newProject.valid || newProject.pristine" class="alert alert-dismissible alert-danger">
+                        <div [hidden]="name.valid">
+                            <strong>Invalid name.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-10">
+                    <input type="button" [disabled]="!newProject.valid" (click)="addProject()" value="Add project" class="btn btn-primary waves-effect waves-light">
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>

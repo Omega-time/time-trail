@@ -1,0 +1,29 @@
+<div class="panel-group" id="accordion">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a data-toggle="collapse" href="javascript:void(0)" (click)="collapse()">
+                <h3 class="panel-title">
+                    Project Documents
+                </h3>
+            </a>
+        </div>
+        <div *ngIf="!collapsed">
+            <div class="panel-body">
+                <file-upload-form [projectId]="projectId" (newFileAdded)="getProjectDocFiles()"></file-upload-form>
+                <table class="table table-striped table-hover panel-group" id="accordion">
+                    <thead>
+                        <tr>
+                            <th>File name</th>
+                            <th>File size</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="special" *ngFor="let docFile of docFiles" [docFile]="docFile" [projectId]="projectId" (fileDeleted)="getProjectDocFiles()">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

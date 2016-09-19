@@ -10,7 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var project_service_1 = require("./project.service");
-var project_component_1 = require("./project.component");
+var project_button_component_1 = require("./project-button.component");
+var project_form_component_1 = require("./project-form.component");
 /**
  * Renders a list of projects provided from {@link ProjectService}.
  * Uses dependency injection to load the service.
@@ -19,6 +20,7 @@ var project_component_1 = require("./project.component");
 var ProjectListComponent = (function () {
     function ProjectListComponent(projectService) {
         this.projectService = projectService;
+        this.collapsed = true;
     }
     /**
      * Implemented method from {@link OnInit} interface which
@@ -26,19 +28,26 @@ var ProjectListComponent = (function () {
      * provided service to load all projects.
      */
     ProjectListComponent.prototype.ngOnInit = function () {
+        this.getAllProjects();
+    };
+    /**
+     * Gets all projects for the current user.
+     */
+    ProjectListComponent.prototype.getAllProjects = function () {
         var _this = this;
         this.projectService.getAllProjects()
-            .then(function (projects) { return _this.projects = projects; })
-            .catch(function (err) {
-            console.error(err);
-        });
+            .then(function (projects) { return _this.projects = projects.reverse(); })
+            .catch(function (err) { return console.error(err); });
+    };
+    ProjectListComponent.prototype.collapse = function () {
+        this.collapsed = !this.collapsed;
     };
     ProjectListComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'project-list',
             templateUrl: 'project-list.component.html',
-            directives: [project_component_1.ProjectComponent],
+            directives: [project_button_component_1.ProjectButtonComponent, project_form_component_1.ProjectFormComponent],
             providers: [project_service_1.ProjectService]
         }), 
         __metadata('design:paramtypes', [project_service_1.ProjectService])

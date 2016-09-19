@@ -1,0 +1,11 @@
+<div>
+    <button type="button" class="close" data-dismiss="alert" (click)="onClickDelete($event)">&times;</button>
+    <label for="title">Name:</label> {{task?.name}}
+    <!-- use the duration pipe here to define the exact amount of hours and minutes separately -->
+    <label for="timeWorked">Time Worked:</label> <span class="badge">{{task?.duration | durationPipe:true}}h</span> <span class="badge">{{task?.duration | durationPipe:false}}m</span>
+    <br>
+    <label for="comment">Comment:</label> {{task?.comment}}
+    <div *ngIf="confirmDelete" class="alert alert-dismissible alert-danger" (clickOutside)="confirmDelete=false">
+        <strong>Are you sure you want to delete this task?</strong> <button class="btn btn-primary" type="button" (click)="deleteTask(task?.id, $event)">Yes, delete it!</button>
+    </div>
+</div>

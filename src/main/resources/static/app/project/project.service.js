@@ -24,8 +24,9 @@ var ProjectService = (function () {
     function ProjectService(http, authService) {
         this.http = http;
         this.authService = authService;
-        this.baseUrl = '';
-        this.serviceUrl = this.baseUrl + '/api/projects';
+        this.projectServiceUrl = 'http://localhost:8080/api/project';
+        this.baseUrl = 'http://localhost:8080';
+        this.projectsServiceUrl = this.baseUrl + '/api/projects';
     }
     ProjectService.prototype.createAuthorizationHeader = function (headers) {
         var authHeaders = headers || new http_1.Headers();
@@ -37,7 +38,7 @@ var ProjectService = (function () {
      * @returns {Promise<Project[]>} a promise which holds an array of Project objects
      */
     ProjectService.prototype.getAllProjects = function () {
-        return this.http.get(this.serviceUrl, {
+        return this.http.get(this.projectsServiceUrl, {
             headers: this.createAuthorizationHeader()
         })
             .map(function (response) { return response.json(); })
@@ -50,11 +51,25 @@ var ProjectService = (function () {
      * @returns {Promise<Project>} a promise which holds a single project object
      */
     ProjectService.prototype.getProjectById = function (id) {
-        return this.http.get(this.serviceUrl + ("/" + id), {
+        return this.http.get(this.projectsServiceUrl + ("/" + id), {
             headers: this.createAuthorizationHeader()
         })
             .map(function (response) { return response.json(); })
             .map(function (project) { return project_1.Project.parseInputObjectToProject(project); })
+            .toPromise();
+    };
+    /**
+     * Deletes a single project object by a given id.
+     * Deletes the tasks of the project as well.
+     * @param id the id by which it deletes the project and its tasks
+     * @returns {Promise<Object>} a promise which holds an anonymous object
+     *                            which holds a response.
+     */
+    ProjectService.prototype.deleteProjectById = function (id) {
+        return this.http.delete(this.projectsServiceUrl + ("/" + id), {
+            headers: this.createAuthorizationHeader()
+        })
+            .map(function (response) { return response.json(); })
             .toPromise();
     };
     /**
@@ -64,7 +79,7 @@ var ProjectService = (function () {
      *                            which holds the new project id
      */
     ProjectService.prototype.saveProject = function (project) {
-        return this.http.post(this.serviceUrl, project, {
+        return this.http.post(this.projectsServiceUrl, project, {
             headers: this.createAuthorizationHeader()
         })
             .map(function (response) { return response.json(); })

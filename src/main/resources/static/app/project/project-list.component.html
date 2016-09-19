@@ -1,5 +1,28 @@
-<ol>
-    <li *ngFor="let project of projects">
-        <project [project]="project"></project>
-    </li>
-</ol>
+<div class="bs-docs-select">
+    <div class="col-lg-10">
+        <div class="col-lg-offset-1 col-lg-10 well">
+                    <a data-toggle="collapse" href="javascript:void(0)" (click)="collapse()">
+                        <h2>
+                            <strong>Create new project</strong>
+                            <span class="badge" data-toggle="tooltip" data-placement="top" title="Project name must be between 2 and 90 symbols">?</span>
+                        </h2>
+                    </a>
+            <project-form *ngIf="!collapsed" (newProjectAdded)="getAllProjects()"></project-form>
+        </div>
+    </div>
+    <div class="col-lg-10">
+        <div class="col-lg-offset-1 col-lg-10">
+            <h2>
+                <strong>Choose your project:</strong>
+            </h2>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Projects</h3>
+                </div>
+                <div class="panel-body">
+                    <project-button *ngFor="let project of projects" [project]="project"></project-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

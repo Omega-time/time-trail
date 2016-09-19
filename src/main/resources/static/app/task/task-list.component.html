@@ -1,0 +1,19 @@
+<div class="bs-docs-section">
+    <div class="col-lg-4 col-lg-offset-1">
+        <h2>
+            <strong>Add new task</strong>
+            <span class="badge" data-toggle="tooltip" data-placement="top" title="Task name must be between 2 and 90 symbols. Task duration must be numbers only.">?</span>
+        </h2>
+        <task-form [projectId]="projectId" (newTaskAdded)="getProjectTasks()"></task-form>
+    </div>
+    <div class="col-lg-6">
+        <h2>
+            <strong>Tasks:</strong>
+        </h2>
+        <ul class="list-group">
+            <li *ngFor="let task of tasks" class="list-group-item">
+                <task [task]="task" (taskDeleted)="getProjectTasks()"></task>
+            </li>
+        </ul>
+    </div>
+</div>

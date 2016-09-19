@@ -6,7 +6,7 @@
 // describe('App: PaysafeInternsTimeTracking', () => {
 //   beforeEach(() => {
 //     addProviders([AppComponent]);
-//   });
+//   })
 //
 //   it('should create the app',
 //     inject([AppComponent], (app: AppComponent) => {

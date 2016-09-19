@@ -22,6 +22,8 @@ var ProjectFormComponent = (function () {
     function ProjectFormComponent(projectService, router) {
         this.projectService = projectService;
         this.router = router;
+        this.active = true;
+        this.newProjectAdded = new core_1.EventEmitter();
     }
     /**
      * Implemented method from {@link OnInit} interface which
@@ -40,8 +42,25 @@ var ProjectFormComponent = (function () {
     ProjectFormComponent.prototype.addProject = function () {
         var _this = this;
         this.projectService.saveProject(this.projectToBeCreated)
-            .then(function (newProjectId) { return _this.router.navigateByUrl("/projects"); });
+            .then(function (newProjectId) {
+            _this.router.navigateByUrl("/projects");
+            _this.newProjectAdded.emit(true);
+            _this.formReset();
+        });
     };
+    /**
+     * Resets the Create project form by giving projectToBeCreated an empty Project object.
+     */
+    ProjectFormComponent.prototype.formReset = function () {
+        var _this = this;
+        this.projectToBeCreated = project_1.Project.createEmptyProject();
+        this.active = false;
+        setTimeout(function () { return _this.active = true; }, 0);
+    };
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], ProjectFormComponent.prototype, "newProjectAdded", void 0);
     ProjectFormComponent = __decorate([
         core_1.Component({
             moduleId: module.id,

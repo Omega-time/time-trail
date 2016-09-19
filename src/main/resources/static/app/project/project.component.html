@@ -1,1 +1,10 @@
-<p>{{project.name}}</p>
+<div class="bs-docs-selection">
+    <div class="row">
+        <div class="col-lg-offset-1 col-lg-10">
+            <file-list [projectId]="projectId"></file-list>
+        </div>
+    </div>
+    <div class="row">
+        <task-list [projectId]="projectId"></task-list>
+    </div>
+</div>

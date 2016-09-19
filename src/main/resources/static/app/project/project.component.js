@@ -9,7 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var project_1 = require("./project");
+var task_list_component_1 = require("../task/task-list.component");
+var file_list_component_1 = require("../file/file-list.component");
+var router_1 = require("@angular/router");
 /**
  * Represents a component which renders a single Project.
  * The project to be render is passed by a property binding
@@ -18,19 +20,24 @@ var project_1 = require("./project");
  * @class
  */
 var ProjectComponent = (function () {
-    function ProjectComponent() {
+    function ProjectComponent(route) {
+        this.route = route;
     }
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', project_1.Project)
-    ], ProjectComponent.prototype, "project", void 0);
+    ProjectComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.route.params.subscribe(function (params) {
+            var id = +params['id']; // (+) converts string 'id' to a number
+            _this.projectId = id;
+        });
+    };
     ProjectComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'project',
-            templateUrl: 'project.component.html'
+            templateUrl: 'project.component.html',
+            directives: [task_list_component_1.TaskListComponent, file_list_component_1.FileListComponent]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [router_1.ActivatedRoute])
     ], ProjectComponent);
     return ProjectComponent;
 }());

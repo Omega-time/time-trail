@@ -7,6 +7,7 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 var map = {
+    'ng2-file-upload': 'vendor/ng2-file-upload',
     'angular2-oauth2': 'vendor/angular2-oauth2',
     "base64-js": "vendor/angular2-oauth2/node_modules/base64-js/lib/b64.js",
     "buffer": "vendor/angular2-oauth2/node_modules/buffer/index.js",
@@ -19,6 +20,11 @@ var map = {
 };
 /** User packages configuration. */
 var packages = {
+    'ng2-file-upload': {
+        format: 'cjs',
+        defaultExtension: 'js',
+        main: 'ng2-file-upload.js'
+    },
     'angular2-oauth2': { defaultExtension: 'js' }
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////
