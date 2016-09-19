@@ -1,15 +1,19 @@
 package paysafe.interns.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@userId")
 public class UserInfo {
     @Id
     @JsonProperty("user_id")
@@ -20,12 +24,12 @@ public class UserInfo {
     private String accessToken;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<Project> projects;
 
-    @ManyToMany
-    private Set<Project> clientProjects;
-
-    public UserInfo() {}
+    public UserInfo() {
+        this.projects = new HashSet<>();
+    }
 
     public String getId() {
         return id;
@@ -55,7 +59,7 @@ public class UserInfo {
         return projects;
     }
 
-    public void setProjects(Set<Project> projects) {
-        this.projects = projects;
+    public void addProject(Project p) {
+        this.projects.add(p);
     }
 }

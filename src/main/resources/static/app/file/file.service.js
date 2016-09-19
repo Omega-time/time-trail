@@ -17,7 +17,7 @@ var FileService = (function () {
     function FileService(http, authService) {
         this.http = http;
         this.authService = authService;
-        this.serviceUrl = 'http://localhost:8080/api/project';
+        this.serviceUrl = 'http://localhost:8080/api/projects';
     }
     FileService.prototype.getAllFileNamesByProjectId = function (projectId) {
         var getAllFilesUrl = this.serviceUrl + ("/" + projectId) + '/files';

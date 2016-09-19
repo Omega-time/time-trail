@@ -24,9 +24,7 @@ var ProjectService = (function () {
     function ProjectService(http, authService) {
         this.http = http;
         this.authService = authService;
-        this.projectServiceUrl = 'http://localhost:8080/api/project';
-        this.baseUrl = 'http://localhost:8080';
-        this.projectsServiceUrl = this.baseUrl + '/api/projects';
+        this.projectsServiceUrl = 'http://localhost:8080/api/projects';
     }
     ProjectService.prototype.createAuthorizationHeader = function (headers) {
         var authHeaders = headers || new http_1.Headers();

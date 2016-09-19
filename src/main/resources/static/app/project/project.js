@@ -16,6 +16,7 @@ var Project = (function () {
      * @returns {Project} the parsed object
      */
     Project.parseInputObjectToProject = function (obj) {
+        console.log(obj.name);
         return new Project(obj.id, obj.name);
     };
     /**

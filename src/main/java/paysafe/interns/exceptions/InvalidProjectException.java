@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Thrown when JPA throws a validation error
  * in our model. Used to hide the stack trace from the client.
  */
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid values passed for project")
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class InvalidProjectException extends RuntimeException {
     public InvalidProjectException() {
     }

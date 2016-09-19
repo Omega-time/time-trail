@@ -8,33 +8,30 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * Class representing a single Task in the database
  */
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@taskId")
 public class Task extends BaseEntity {
-	
+
 	/** Task name */
 	@Size(min=2,max=255)
-	@NotNull	
+	@NotNull
 	private String name;
-	
+
 	/** Task duration */
 	@Min(0)
-	@NotNull	
+	@NotNull
 	private long duration;
-	
+
 	/** Task comment (not required) */
 	private String comment;
-	
-	@JsonIgnore
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "project_id")
+    @JsonBackReference
 	private Project project;
 
 
