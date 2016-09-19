@@ -8,12 +8,15 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
  * Class representing a single Task in the database
  */
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@taskId")
 public class Task extends BaseEntity {
 	
 	/** Task name */

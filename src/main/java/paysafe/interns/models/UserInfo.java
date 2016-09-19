@@ -1,14 +1,15 @@
 package paysafe.interns.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@userId")
 public class UserInfo {
     @Id
     @JsonProperty("user_id")
@@ -18,11 +19,13 @@ public class UserInfo {
     @Transient
     private String accessToken;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
     private Set<Project> projects;
 
-    public UserInfo() {}
+    @ManyToMany
+    private Set<Project> clientProjects;
 
+    public UserInfo() {}
 
     public String getId() {
         return id;

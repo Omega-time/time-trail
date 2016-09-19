@@ -1,5 +1,7 @@
 package paysafe.interns.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import javax.persistence.ElementCollection;
@@ -17,6 +19,7 @@ import java.util.Set;
  * tasks and docs it should contain.
  */
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@projectId")
 public class Project extends BaseEntity {
 	/** Project name */
 	@NotNull
@@ -25,8 +28,7 @@ public class Project extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "project_owner")
-	private UserInfo user;
-
+	private UserInfo owner;
 
 	/** List of tasks for the chosen project */
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
@@ -37,6 +39,8 @@ public class Project extends BaseEntity {
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<Doc> files;
 
+	@ManyToMany
+	private Set<UserInfo> clients;
 
 	public Project() {
 	}
@@ -65,11 +69,11 @@ public class Project extends BaseEntity {
 		this.files = files;
 	}
 
-	public UserInfo getUser() {
-		return user;
+	public UserInfo getOwner() {
+		return owner;
 	}
 
-	public void setUser(UserInfo user) {
-		this.user = user;
+	public void setOwner(UserInfo owner) {
+		this.owner = owner;
 	}
 }
