@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import paysafe.interns.exceptions.DocNotFoundException;
 import paysafe.interns.exceptions.InvalidDocException;
-import org.springframework.data.repository.query.Param;
-import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
-import org.springframework.web.bind.annotation.*;
 import paysafe.interns.exceptions.InvalidProjectException;
 import paysafe.interns.helpers.DocUtilities;
 import paysafe.interns.models.Doc;
@@ -31,9 +28,8 @@ import java.io.Serializable;
  * service. It uses Autowired annotation in order to use component scan for our
  * {@link ProjectsRepository}
  */
-@RequestMapping("/api")
 @RestController
-public class ProjectsRestController {
+public class ProjectsRestController extends BaseRestController {
     private static final int MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB = 10240;
     @Autowired
     private ProjectsRepository projectsRepository;
