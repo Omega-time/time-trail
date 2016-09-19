@@ -36,11 +36,11 @@ dependencies {
 	compile 'com.google.api-client:google-api-client:1.20.0'
 	compile 'com.google.apis:google-api-services-oauth2:v2-rev75-1.19.0'
 	compile('org.json:json:20090211')
+	compile('org.testng:testng:6.9.10')
 	runtime('org.postgresql:postgresql')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
 }
-
 
 eclipse {
 	classpath {
