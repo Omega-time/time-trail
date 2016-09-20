@@ -1,21 +1,29 @@
 package paysafe.interns.controllers;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import paysafe.interns.exceptions.InvalidTaskException;
 import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
 import paysafe.interns.repositories.ProjectsRepository;
 import paysafe.interns.repositories.TasksRepository;
-
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import java.io.Serializable;
 
 /**
  * A RestController class where we define the endpoint URLs for the Task
@@ -46,6 +54,7 @@ public class TasksRestController extends BaseRestController {
         try {
             Project project = projectsRepository.getOne(projectId);
             task.setProject(project);
+            task.setDate(new Timestamp(new Date().getTime()));
             tasksRepository.saveAndFlush(task);
         } catch (ConstraintViolationException cve) {
             throw new InvalidTaskException(cve);

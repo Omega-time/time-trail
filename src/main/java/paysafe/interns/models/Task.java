@@ -1,5 +1,7 @@
 package paysafe.interns.models;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -32,6 +34,10 @@ public class Task extends BaseEntity {
 	/** Task comment (not required) */
 	private String comment;
 	
+	/** Task date of creation */
+	private Timestamp date;
+	
+
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "project_id")
@@ -72,5 +78,13 @@ public class Task extends BaseEntity {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	
+	public Timestamp getDate() {
+		return date;
+	}
+
+	public void setDate(Timestamp date) {
+		this.date = date;
 	}
 }
