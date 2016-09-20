@@ -16,4 +16,5 @@ import paysafe.interns.models.UserInfo;
 @Transactional
 public interface ProjectsRepository extends JpaRepository<Project, Long> {
     public Collection<Project> findAllByOwner(UserInfo owner);
+    public Collection<Project> findAllByClients(UserInfo client);
 }

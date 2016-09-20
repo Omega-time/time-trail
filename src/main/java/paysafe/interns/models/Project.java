@@ -1,15 +1,11 @@
 package paysafe.interns.models;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -35,10 +31,16 @@ public class Project extends BaseEntity {
     @JsonBackReference
     private UserInfo owner;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "client_project",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "client_id"))
+    private Set<UserInfo> clients;
+
     /** List of tasks for the chosen project */
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
     @JsonManagedReference
-    private List<Task> tasks;
+    private Set<Task> tasks;
 
     /** Set of files(docs) for the chosen project */
     @ElementCollection
@@ -52,6 +54,7 @@ public class Project extends BaseEntity {
     private Timestamp dateLastChanged;
 
     public Project() {
+        this.clients = new HashSet<>();
     }
 
     public String getName() {
@@ -62,11 +65,11 @@ public class Project extends BaseEntity {
         this.name = name;
     }
 
-    public List<Task> getTasks() {
+    public Set<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(List<Task> tasks) {
+    public void setTasks(Set<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -110,4 +113,11 @@ public class Project extends BaseEntity {
         this.dateLastChanged = dateLastChanged;
     }
 
+    public Set<UserInfo> getClients() {
+        return clients;
+    }
+
+    public void addClient(UserInfo client) {
+        this.clients.add(client);
+    }
 }
