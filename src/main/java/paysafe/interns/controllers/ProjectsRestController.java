@@ -73,7 +73,7 @@ public class ProjectsRestController extends BaseRestController {
      *            a path parameter by which the method finds a specific project
      * @return a json representation of a project or empty string
      */
-    @RequestMapping("/project/{id}")
+    @RequestMapping("/project/{projectId}")
     Project getProjectById(@PathVariable Long projectId, HttpServletRequest request) {
         new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
 

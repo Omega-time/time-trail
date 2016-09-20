@@ -47,9 +47,9 @@ public class Project extends BaseEntity {
 
     private String lastTaskName;
 
-    private Timestamp DateOfCreation;
+    private Timestamp dateOfCreation;
 
-    private Timestamp DateLastChanged;
+    private Timestamp dateLastChanged;
 
     public Project() {
     }
@@ -95,19 +95,19 @@ public class Project extends BaseEntity {
     }
 
     public Timestamp getDateOfCreation() {
-        return DateOfCreation;
+        return dateOfCreation;
     }
 
     public void setDateOfCreation(Timestamp dateOfCreation) {
-        DateOfCreation = dateOfCreation;
+        this.dateOfCreation = dateOfCreation;
     }
 
     public Timestamp getDateLastChanged() {
-        return DateLastChanged;
+        return dateLastChanged;
     }
 
     public void setDateLastChanged(Timestamp dateLastChanged) {
-        DateLastChanged = dateLastChanged;
+        this.dateLastChanged = dateLastChanged;
     }
 
 }
