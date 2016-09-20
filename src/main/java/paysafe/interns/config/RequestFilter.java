@@ -1,5 +1,18 @@
 package paysafe.interns.config;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -8,19 +21,9 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Tokeninfo;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.filter.OncePerRequestFilter;
+
 import paysafe.interns.models.UserInfo;
 import paysafe.interns.repositories.UserRepository;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 public class RequestFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
@@ -33,10 +36,10 @@ public class RequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-//        if(request.getMethod().equals("OPTIONS")) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
+        if (request.getMethod().equals("OPTIONS")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if(request.getRequestURI().startsWith("/api")) {
             String accessToken = request.getHeader("Authorization");
             if (accessToken != null) {

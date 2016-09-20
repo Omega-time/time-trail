@@ -10,81 +10,77 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * Class representing a single Task in the database
  */
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@taskId")
 public class Task extends BaseEntity {
-	
-	/** Task name */
-	@Size(min=2,max=255)
-	@NotNull	
-	private String name;
-	
-	/** Task duration */
-	@Min(0)
-	@NotNull	
-	private long duration;
-	
-	/** Task comment (not required) */
-	private String comment;
-	
-	/** Task date of creation */
-	private Timestamp date;
-	
 
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "project_id")
-	private Project project;
+    /** Task name */
+    @Size(min = 2, max = 255)
+    @NotNull
+    private String name;
 
+    /** Task duration */
+    @Min(0)
+    @NotNull
+    private long duration;
 
-	public Project getProject() {
-		return project;
-	}
+    /** Task comment (not required) */
+    private String comment;
 
-	public void setProject(Project project) {
-		this.project = project;
-	}
+    /** Task date of creation */
+    private Timestamp date;
 
-	public Task() {
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id")
+    @JsonBackReference
+    private Project project;
 
 
-	public long getDuration() {
-		return duration;
-	}
+    public Project getProject() {
+        return project;
+    }
 
-	public void setDuration(long duration) {
-		this.duration = duration;
-	}
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
-	public String getComment() {
-		return comment;
-	}
+    public Task() {
+    }
 
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	
-	public Timestamp getDate() {
-		return date;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setDate(Timestamp date) {
-		this.date = date;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Timestamp getDate() {
+        return date;
+    }
+
+    public void setDate(Timestamp date) {
+        this.date = date;
+    }
 }

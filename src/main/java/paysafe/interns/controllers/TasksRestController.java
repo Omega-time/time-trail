@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import paysafe.interns.exceptions.InvalidTaskException;
+import paysafe.interns.helpers.AccessChecker;
 import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
 import paysafe.interns.repositories.ProjectsRepository;
@@ -40,21 +42,29 @@ public class TasksRestController extends BaseRestController {
     private TasksRepository tasksRepository;
 
     /**
-     * POST Serves the {@link TasksRepository#save(Object)}} method. Saves a task in
-     * the database related to the provided project id.
+     * POST Serves the {@link TasksRepository#save(Object)}} method. Saves a
+     * task in the database related to the provided project id.
      *
-     * @param task          the new Task which will be saved to the database.
-     * @param projectId     the project for which the new task is created.
-     * @param bindingResult checks the entity validations
+     * @param task
+     *            the new Task which will be saved to the database.
+     * @param projectId
+     *            the project for which the new task is created.
+     * @param bindingResult
+     *            checks the entity validations
      * @return Id of the newly created Task or Bad Request with error data
-     * object
+     *         object
      */
     @RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.POST)
-    public String addTask(@Valid @RequestBody Task task, @PathVariable Long projectId, BindingResult bindingResult) {
+    public String addTask(@Valid @RequestBody Task task, @PathVariable Long projectId, BindingResult bindingResult,
+            HttpServletRequest request) {
+        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+
         try {
             Project project = projectsRepository.getOne(projectId);
+            project.setDateLastChanged(new Timestamp(new Date().getTime()));
             task.setProject(project);
             task.setDate(new Timestamp(new Date().getTime()));
+            project.setLastTaskName(task.getName());
             tasksRepository.saveAndFlush(task);
         } catch (ConstraintViolationException cve) {
             throw new InvalidTaskException(cve);
@@ -72,12 +82,14 @@ public class TasksRestController extends BaseRestController {
     /**
      * GET Serving {@link TasksRepository#findAllByProjectId(Long)} method
      *
-     * @param projectId a path parameter by which the method finds a specific tasks
+     * @param projectId
+     *            a path parameter by which the method finds a specific tasks
      * @return a json string array of all tasks with current projectId or empty
-     * array
+     *         array
      */
     @RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.GET)
-    public Iterable<Task> getAllTasksByProjectId(@PathVariable Long projectId) {
+    public Iterable<Task> getAllTasksByProjectId(@PathVariable Long projectId, HttpServletRequest request) {
+        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
 
         return tasksRepository.findAllByProjectId(projectId);
     }
@@ -85,12 +97,15 @@ public class TasksRestController extends BaseRestController {
     /**
      * GET Serving {@link TasksRepository#getOne(Serializable)} method
      *
-     * @param taskId a path parameter by which the method finds a specific task
+     * @param taskId
+     *            a path parameter by which the method finds a specific task
      * @return task with current taskId or Unable to find task with id current
-     * taskId
+     *         taskId
      */
     @RequestMapping(value = "/task/{taskId}", method = RequestMethod.GET)
-    public String getTaskByTaskId(@PathVariable Long taskId) {
+    public String getTaskByTaskId(@PathVariable Long taskId, HttpServletRequest request) {
+        new AccessChecker().checkTaskAccess(taskId, request, tasksRepository, projectsRepository);
+
         try {
             Task task = null;
             try {
@@ -113,19 +128,23 @@ public class TasksRestController extends BaseRestController {
             throw new InvalidTaskException("Task not found");
         }
     }
-
     /**
      * DELETE Serving {@link TasksRepository#delete(Serializable)} method
      *
-     * @param taskId a path parameter by which the method finds a specific task
+     * @param taskId
+     *            a path parameter by which the method finds a specific task
      * @return Task with current taskId deleted or Unable to find task with
-     * current taskId.
+     *         current taskId.
      */
     @RequestMapping(value = "/task/{taskId}", method = RequestMethod.DELETE)
-    public String deleteTaskByTaskId(@PathVariable Long taskId) {
+    public String deleteTaskByTaskId(@PathVariable Long taskId, HttpServletRequest request) {
+        new AccessChecker().checkTaskAccess(taskId, request, tasksRepository, projectsRepository);
+
         JSONObject response = new JSONObject();
         try {
             Task taskForDeleted = tasksRepository.getOne(taskId);
+            Project project = taskForDeleted.getProject();
+            project.setDateLastChanged(new Timestamp(new Date().getTime()));
             tasksRepository.delete(taskForDeleted);
             response.put("id", taskForDeleted.getId());
             return response.toString();

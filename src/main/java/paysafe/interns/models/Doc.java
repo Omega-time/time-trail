@@ -1,8 +1,5 @@
 package paysafe.interns.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 
@@ -12,7 +9,6 @@ import javax.persistence.Lob;
  * in {@link Project}
  */
 @Embeddable
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@documentId")
 public class Doc {
     /** The name of the uploaded doc */
     private String name;
@@ -68,3 +64,4 @@ public class Doc {
                 '}';
     }
 }
+

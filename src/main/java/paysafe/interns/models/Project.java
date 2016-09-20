@@ -1,79 +1,113 @@
 package paysafe.interns.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
-import java.util.Set;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * Class representing a single Project in the database and its connection to the
  * tasks and docs it should contain.
  */
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@projectId")
 public class Project extends BaseEntity {
-	/** Project name */
-	@NotNull
-	@Size(min=2, max=255)
-	private String name;
+    /** Project name */
+    @NotNull
+    @Size(min = 2, max = 255)
+    private String name;
 
-	@ManyToOne
-	@JoinColumn(name = "project_owner")
-	private UserInfo owner;
+    @ManyToOne
+    @JoinColumn(name = "project_owner")
+    @JsonBackReference
+    private UserInfo owner;
 
-	/** List of tasks for the chosen project */
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
-	private List<Task> tasks;
+    /** List of tasks for the chosen project */
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "project")
+    @JsonManagedReference
+    private List<Task> tasks;
 
-	/** Set of files(docs) for the chosen project */
-	@ElementCollection
-	@LazyCollection(LazyCollectionOption.FALSE)
-	private Set<Doc> files;
+    /** Set of files(docs) for the chosen project */
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private Set<Doc> files;
 
-	@ManyToMany
-	private Set<UserInfo> clients;
+    private String lastTaskName;
 
-	public Project() {
-	}
+    private Timestamp DateOfCreation;
 
-	public String getName() {
-		return name;
-	}
+    private Timestamp DateLastChanged;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public Project() {
+    }
 
-	public List<Task> getTasks() {
-		return tasks;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setTasks(List<Task> tasks) {
-		this.tasks = tasks;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Set<Doc> getFiles() {
-		return files;
-	}
+    public List<Task> getTasks() {
+        return tasks;
+    }
 
-	public void setFiles(Set<Doc> files) {
-		this.files = files;
-	}
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
 
-	public UserInfo getOwner() {
-		return owner;
-	}
+    public Set<Doc> getFiles() {
+        return files;
+    }
 
-	public void setOwner(UserInfo owner) {
-		this.owner = owner;
-	}
+    public void setFiles(Set<Doc> files) {
+        this.files = files;
+    }
+
+    public UserInfo getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserInfo owner) {
+        this.owner = owner;
+    }
+
+    public String getLastTaskName() {
+        return lastTaskName;
+    }
+
+    public void setLastTaskName(String lastTaskName) {
+        this.lastTaskName = lastTaskName;
+    }
+
+    public Timestamp getDateOfCreation() {
+        return DateOfCreation;
+    }
+
+    public void setDateOfCreation(Timestamp dateOfCreation) {
+        DateOfCreation = dateOfCreation;
+    }
+
+    public Timestamp getDateLastChanged() {
+        return DateLastChanged;
+    }
+
+    public void setDateLastChanged(Timestamp dateLastChanged) {
+        DateLastChanged = dateLastChanged;
+    }
+
 }
