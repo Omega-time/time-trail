@@ -3,6 +3,7 @@ package paysafe.interns.controllers;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +46,7 @@ import paysafe.interns.repositories.UserRepository;
  * {@link ProjectsRepository}
  */
 @RestController
+@RequestMapping("/api/projects")
 public class ProjectsRestController extends BaseRestController {
     private static final int MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB = 10240;
     @Autowired
@@ -59,21 +64,30 @@ public class ProjectsRestController extends BaseRestController {
      * @return a json string array of all projects or empty array
      */
     // TODO: Should return all projects created by a user
-    @RequestMapping("/projects")
+    @RequestMapping
     Iterable<Project> getAllProjects(HttpServletRequest request) {
-        UserInfo user = (UserInfo) request.getSession().getAttribute("user");
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
 
-        return projectsRepository.findAllByOwner(user);
+        Collection<Project> projects = this.projectsRepository.findAllByOwner(cachedUser);
+        projects.addAll(this.projectsRepository.findAllByClients(cachedUser));
+        return projects;
     }
+
+//    @RequestMapping("/projects/client")
+//    Iterable<Project> getClientProjects(HttpServletRequest request) {
+//        UserInfo user = (UserInfo) request.getSession().getAttribute("user");
+//
+//        return this.projectsRepository.findAllByClients(user);
+//    }
 
     /**
      * GET Serving the {@link ProjectsRepository#findOne(Serializable)} method
      *
-     * @param id
+     * @param projectId
      *            a path parameter by which the method finds a specific project
      * @return a json representation of a project or empty string
      */
-    @RequestMapping("/project/{projectId}")
+    @RequestMapping("/{projectId}")
     Project getProjectById(@PathVariable Long projectId, HttpServletRequest request) {
         new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
 
@@ -95,8 +109,7 @@ public class ProjectsRestController extends BaseRestController {
      *             {@link javax.validation.ConstraintViolationException} when
      *             validating the input json request body.
      */
-    @RequestMapping(value = "/projects", method = RequestMethod.POST)
-
+    @RequestMapping(method = RequestMethod.POST)
     String addProject(@RequestBody Project project, HttpServletRequest request) throws InvalidProjectException {
         UserInfo user = (UserInfo) request.getSession().getAttribute("user");
         project.setOwner(user);
@@ -119,6 +132,21 @@ public class ProjectsRestController extends BaseRestController {
         return response.toString();
     }
 
+    @RequestMapping(value = "/{projectId}/client", method = RequestMethod.PATCH)
+    public ResponseEntity<InputStreamResource> addClient(@PathVariable Long projectId, @RequestBody String email) {
+        UserInfo client = this.userRepository.findOneByEmail(email);
+        if(client != null) {
+            Project project = this.projectsRepository.findOne(projectId);
+            if(project != null) {
+                project.addClient(client);
+                this.projectsRepository.save(project);
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     /**
      * DELETE Serving {@link ProjectsRepository} method. First get all tasks
      * related to the provided project id and deleted tasks.Then delete current
@@ -129,7 +157,7 @@ public class ProjectsRestController extends BaseRestController {
      * @return Project with current projectId deleted or Unable to find project
      *         with current projectId.
      */
-    @RequestMapping(value = "/project/{projectId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
     public String deleteProjectByProjectId(@PathVariable Long projectId, HttpServletRequest request) {
         new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
 
@@ -159,7 +187,7 @@ public class ProjectsRestController extends BaseRestController {
      *            {@link DocUtilities#docContentTypeIsAllowed(String)}
      * @return The name of the uploaded file if uploaded successfully.
      */
-    @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.POST)
+    @RequestMapping(value = "/{projectId}/files", method = RequestMethod.POST)
     public String uploadDocToProject(@Valid @PathVariable Long projectId,
             @RequestParam("file") MultipartFile multipartFile, HttpServletRequest request) {
         new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
@@ -191,7 +219,7 @@ public class ProjectsRestController extends BaseRestController {
      * @return a List of all the names of the files currently saved in the
      *         project.
      */
-    @RequestMapping(value = "/project/{projectId}/files", method = RequestMethod.GET)
+    @RequestMapping(value = "/{projectId}/files", method = RequestMethod.GET)
     public String getAllDocNamesByProjectId(@Valid @PathVariable Long projectId, HttpServletRequest request) {
         new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
 
@@ -218,7 +246,7 @@ public class ProjectsRestController extends BaseRestController {
      * @param response
      *            used to set headers and access OutputStream
      */
-    @RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{projectId}/{fileName:.+}", method = RequestMethod.GET)
     public void getDocFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
             HttpServletResponse response, HttpServletRequest request) {
         new AccessChecker().checkDocAccess(fileName, projectId, request, projectsRepository);
@@ -249,7 +277,7 @@ public class ProjectsRestController extends BaseRestController {
      *            the name of the file to be deleted
      * @return The name of the deleted file if successful
      */
-    @RequestMapping(value = "/project/{projectId}/{fileName:.+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{projectId}/{fileName:.+}", method = RequestMethod.DELETE)
     public String deleteDocFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
             HttpServletRequest request) {
         new AccessChecker().checkDocAccess(fileName, projectId, request, projectsRepository);

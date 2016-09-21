@@ -61,7 +61,16 @@ public class AccessChecker {
     }
 
     private void checkUserRights(Long projectId, UserInfo user, ProjectsRepository projectsRepository) {
-        if (!projectsRepository.findOne(projectId).getOwner().getId().equals(user.getId())) {
+        Project project = projectsRepository.findOne(projectId);
+        boolean checkOwner = project.getOwner().getId().equals(user.getId());
+        boolean checkClient = false;
+        for(UserInfo client : project.getClients()) {
+            if(client.getId().equals(user.getId())) {
+                checkClient = true;
+                break;
+            }
+        }
+        if (!checkOwner && !checkClient) {
             throw new UserAccessException(String.format(NO_ACCESS_RIGHTS_MESSAGE));
         }
     }
