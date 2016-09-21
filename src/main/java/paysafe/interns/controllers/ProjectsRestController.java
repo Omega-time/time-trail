@@ -89,7 +89,8 @@ public class ProjectsRestController extends BaseRestController {
      */
     @RequestMapping("/{projectId}")
     Project getProjectById(@PathVariable Long projectId, HttpServletRequest request) {
-        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkProjectAccess(projectId, cachedUser, projectsRepository);
 
         return this.projectsRepository.findOne(projectId);
     }
@@ -159,7 +160,8 @@ public class ProjectsRestController extends BaseRestController {
      */
     @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
     public String deleteProjectByProjectId(@PathVariable Long projectId, HttpServletRequest request) {
-        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkProjectAccess(projectId, cachedUser, projectsRepository);
 
         Project projectForDeleted = projectsRepository.getOne(projectId);
         Iterable<Task> tasksByCurrentProject = tasksRepository.findAllByProjectId(projectId);
@@ -190,7 +192,8 @@ public class ProjectsRestController extends BaseRestController {
     @RequestMapping(value = "/{projectId}/files", method = RequestMethod.POST)
     public String uploadDocToProject(@Valid @PathVariable Long projectId,
             @RequestParam("file") MultipartFile multipartFile, HttpServletRequest request) {
-        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkProjectAccess(projectId, cachedUser, projectsRepository);
 
         Project project = projectsRepository.findOne(projectId);
         project.setDateLastChanged(new Timestamp(new Date().getTime()));
@@ -221,7 +224,8 @@ public class ProjectsRestController extends BaseRestController {
      */
     @RequestMapping(value = "/{projectId}/files", method = RequestMethod.GET)
     public String getAllDocNamesByProjectId(@Valid @PathVariable Long projectId, HttpServletRequest request) {
-        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkProjectAccess(projectId, cachedUser, projectsRepository);
 
         JSONArray jsonArray = new JSONArray();
         Project project = projectsRepository.findOne(projectId);
@@ -249,7 +253,8 @@ public class ProjectsRestController extends BaseRestController {
     @RequestMapping(value = "/{projectId}/{fileName:.+}", method = RequestMethod.GET)
     public void getDocFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
             HttpServletResponse response, HttpServletRequest request) {
-        new AccessChecker().checkDocAccess(fileName, projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkDocAccess(fileName, projectId, cachedUser, projectsRepository);
 
         try {
             Project project = projectsRepository.findOne(projectId);
@@ -280,7 +285,8 @@ public class ProjectsRestController extends BaseRestController {
     @RequestMapping(value = "/{projectId}/{fileName:.+}", method = RequestMethod.DELETE)
     public String deleteDocFromProjectByName(@PathVariable Long projectId, @PathVariable String fileName,
             HttpServletRequest request) {
-        new AccessChecker().checkDocAccess(fileName, projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkDocAccess(fileName, projectId, cachedUser, projectsRepository);
 
         Project project = projectsRepository.findOne(projectId);
         project.setDateLastChanged(new Timestamp(new Date().getTime()));

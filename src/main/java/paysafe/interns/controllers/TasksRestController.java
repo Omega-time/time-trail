@@ -24,6 +24,7 @@ import paysafe.interns.exceptions.InvalidTaskException;
 import paysafe.interns.helpers.AccessChecker;
 import paysafe.interns.models.Project;
 import paysafe.interns.models.Task;
+import paysafe.interns.models.UserInfo;
 import paysafe.interns.repositories.ProjectsRepository;
 import paysafe.interns.repositories.TasksRepository;
 
@@ -57,7 +58,8 @@ public class TasksRestController extends BaseRestController {
     @RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.POST)
     public String addTask(@Valid @RequestBody Task task, @PathVariable Long projectId, BindingResult bindingResult,
             HttpServletRequest request) {
-        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkProjectAccess(projectId, cachedUser, projectsRepository);
 
         try {
             Project project = projectsRepository.getOne(projectId);
@@ -89,7 +91,8 @@ public class TasksRestController extends BaseRestController {
      */
     @RequestMapping(value = "/tasks/{projectId}", method = RequestMethod.GET)
     public Iterable<Task> getAllTasksByProjectId(@PathVariable Long projectId, HttpServletRequest request) {
-        new AccessChecker().checkProjectAccess(projectId, request, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkProjectAccess(projectId, cachedUser, projectsRepository);
 
         return tasksRepository.findAllByProjectId(projectId);
     }
@@ -104,7 +107,8 @@ public class TasksRestController extends BaseRestController {
      */
     @RequestMapping(value = "/task/{taskId}", method = RequestMethod.GET)
     public String getTaskByTaskId(@PathVariable Long taskId, HttpServletRequest request) {
-        new AccessChecker().checkTaskAccess(taskId, request, tasksRepository, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkTaskAccess(taskId, cachedUser, tasksRepository, projectsRepository);
 
         try {
             Task task = null;
@@ -138,7 +142,8 @@ public class TasksRestController extends BaseRestController {
      */
     @RequestMapping(value = "/task/{taskId}", method = RequestMethod.DELETE)
     public String deleteTaskByTaskId(@PathVariable Long taskId, HttpServletRequest request) {
-        new AccessChecker().checkTaskAccess(taskId, request, tasksRepository, projectsRepository);
+        UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
+        new AccessChecker().checkTaskAccess(taskId, cachedUser, tasksRepository, projectsRepository);
 
         JSONObject response = new JSONObject();
         try {
