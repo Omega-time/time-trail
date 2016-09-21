@@ -14,6 +14,7 @@ public class AccessChecker {
     private static final String NO_DOC_FOUND_MESSAGE = "Unable to find doc with name %d";
     private static final String NO_TASK_FOUND_MESSAGE = "Unable to find task with id %d";
 
+
     public void checkTaskAccess(Long taskId, UserInfo user, TasksRepository tasksRepository,
             ProjectsRepository projectsRepository) {
 
@@ -54,7 +55,6 @@ public class AccessChecker {
     }
 
     private void checkUserRights(Long projectId, UserInfo user, ProjectsRepository projectsRepository) {
-        checkIfUserIsClient(projectId, user, projectsRepository);
         Project project = projectsRepository.findOne(projectId);
         boolean checkOwner = project.getOwner().getId().equals(user.getId());
         boolean checkClient = false;
@@ -66,13 +66,6 @@ public class AccessChecker {
         }
         if (!checkOwner && !checkClient) {
             throw new UserAccessException(String.format(NO_ACCESS_RIGHTS_MESSAGE));
-        }
-    }
-
-    private void checkIfUserIsClient(Long projectId, UserInfo user, ProjectsRepository projectsRepository) {
-        Project project = projectsRepository.findOne(projectId);
-        if (!(project.getClients() == null) && project.getClients().contains(user)) {
-            throw new UserAccessException(NO_ACCESS_RIGHTS_MESSAGE);
         }
     }
 }
