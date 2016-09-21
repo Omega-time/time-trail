@@ -1,17 +1,32 @@
 package paysafe.interns.controllers;
 
-import org.apache.http.HttpResponse;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import paysafe.interns.exceptions.DocNotFoundException;
 import paysafe.interns.exceptions.InvalidDocException;
 import paysafe.interns.exceptions.InvalidProjectException;
@@ -24,17 +39,6 @@ import paysafe.interns.models.UserInfo;
 import paysafe.interns.repositories.ProjectsRepository;
 import paysafe.interns.repositories.TasksRepository;
 import paysafe.interns.repositories.UserRepository;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 
 /**
  * A RestController class where we define the endpoint URLs for the Project
@@ -60,6 +64,7 @@ public class ProjectsRestController extends BaseRestController {
      * @return a json string array of all projects or empty array
      */
     // TODO: Should return all projects created by a user
+    @RequestMapping
     Iterable<Project> getAllProjects(HttpServletRequest request) {
         UserInfo cachedUser = (UserInfo) request.getSession().getAttribute("user");
 

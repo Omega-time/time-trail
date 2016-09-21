@@ -2,10 +2,17 @@ package paysafe.interns.models;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -30,11 +37,12 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "project_owner")
     @JsonBackReference
     private UserInfo owner;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "client_project",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "client_id"))
+            joinColumns = @JoinColumn(name = "project_id", unique=false),
+            inverseJoinColumns = @JoinColumn(name = "client_id", unique=false)
+    		)
     private Set<UserInfo> clients;
 
     /** List of tasks for the chosen project */
