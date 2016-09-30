@@ -16,6 +16,9 @@ import java.util.Set;
  */
 public final class DocUtilities {
 
+    private DocUtilities(){
+    }
+
     private static final int MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB = 10240;
 
     public static Doc getDocFromProjectByName(String fileName, Project project) {

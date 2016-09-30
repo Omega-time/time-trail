@@ -1,16 +1,5 @@
 package paysafe.interns.controllers;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,14 +8,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import paysafe.interns.exceptions.DocNotFoundException;
 import paysafe.interns.exceptions.InvalidDocException;
 import paysafe.interns.exceptions.InvalidProjectException;
@@ -40,6 +23,16 @@ import paysafe.interns.repositories.ProjectsRepository;
 import paysafe.interns.repositories.TasksRepository;
 import paysafe.interns.repositories.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Date;
+
 /**
  * A RestController class where we define the endpoint URLs for the Project
  * service. It uses Autowired annotation in order to use component scan for our
@@ -48,7 +41,6 @@ import paysafe.interns.repositories.UserRepository;
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectsRestController extends BaseRestController {
-    private static final int MAX_SIZE_OF_ALL_FILES_PER_PROJECT_IN_KB = 10240;
     @Autowired
     private ProjectsRepository projectsRepository;
 
