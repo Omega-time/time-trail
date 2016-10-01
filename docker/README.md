@@ -14,6 +14,8 @@ and finally to `docker/frontend` and run `docker build -t local/frontend .` to b
 After you sucessfully created the docker images for database, back-end and front-end, run `docker images` to list the
 images we just created. Start the database, backend and frontend images by typing:
 
-## docker run -d -p 5432:5433 <Id of the database image>
-## docker run -d -p 8080:8181 <Id of the backend image>
-## docker run -d -p 4200:4201 <Id of the frontend image>
+`docker run -d -p 5432:5433 <Id of the database image>`
+
+`docker run -d -p 8080:8181 <Id of the backend image>`
+
+`docker run -d -p 4200:4201 <Id of the frontend image>`
