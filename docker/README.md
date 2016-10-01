@@ -1,6 +1,6 @@
 # PaysafeInternsTimeTracking - Docker
 
-## Generate docker containers
+## Generate docker images
 First of all, install docker by running the command `yum install -y docker`.
 
 Navigate to `docker/database` and run `docker build -t local/database .` to build the image for the database,
@@ -9,7 +9,7 @@ then go to `docker/backend` and run `docker build -t local/backend .` to build t
 
 and finally to `docker/frontend` and run `docker build -t local/frontend .` to build the image for the front-end.
 
-## Deploying the application
+## Deploying the application by running the docker containers
 
 After you sucessfully created the docker images for database, back-end and front-end, run `docker images` to list the
 images we just created. Start the database, backend and frontend images by typing:
